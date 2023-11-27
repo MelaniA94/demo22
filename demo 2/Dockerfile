@@ -22,5 +22,8 @@ COPY --from=builder /app/target/*.jar app.jar
 # Expose the port on which the Spring Boot application will run
 EXPOSE 8080
 
+USER 10014
+
+
 # Set the entry point for the container to run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
