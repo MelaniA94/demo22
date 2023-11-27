@@ -1,5 +1,5 @@
 # Use Maven for building the application
-FROM maven:3.5-jdk-8-alpine AS builder
+FROM maven:3.5-jdk-8-alpine 
 
 # Set the working directory inside the container
 WORKDIR . /app
