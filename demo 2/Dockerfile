@@ -1,21 +1,21 @@
-FROM maven:3.5-jdk-8-alpine
-
-WORKDIR /swagger-petstore
-COPY . /swagger-petstore
-
+# Build Stage
+FROM maven:3.8.4-openjdk-11 AS build
+WORKDIR /app
+COPY . /app
 RUN mvn clean install
 
-FROM openjdk:8-jre-alpine
+# Run Stage
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar /app/app.jar
 
-WORKDIR /swagger-petstore
-
-COPY --from=0 /swagger-petstore/target/lib/jetty-runner.jar /swagger-petstore/jetty-runner.jar
-COPY --from=0 /swagger-petstore/target/*.war /swagger-petstore/server.war
-COPY src/main/resources/openapi.yaml /swagger-petstore/openapi.yaml
-COPY inflector.yaml /swagger-petstore/inflector.yaml
-
+# Expose the application port
 EXPOSE 8080
 
 USER 10014
 
-CMD ["java", "-jar", "-DswaggerUrl=openapi.yaml", "/swagger-petstore/jetty-runner.jar", "/swagger-petstore/server.war"]
+# Run the application
+CMD ["java", "-jar", "/app/app.jar"]
+
+
+
