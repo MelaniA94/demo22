@@ -12,7 +12,6 @@ COPY --from=build /app/target/*.jar /app/app.jar
 # Expose the application port
 EXPOSE 8080
 
-USER 10014
 
 # Run the application
 CMD ["java", "-jar", "/app/app.jar"]
