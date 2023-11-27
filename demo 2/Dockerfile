@@ -1,29 +1,21 @@
-# Use Maven for building the application
-FROM maven:3.5-jdk-8-alpine 
+FROM maven:3.5-jdk-8-alpine
 
-# Set the working directory inside the container
-WORKDIR . /app
+WORKDIR /swagger-petstore
+COPY . /swagger-petstore
 
-# Copy the project files into the container
-COPY . .
+RUN mvn clean install
 
-# Build the application using Maven
-RUN mvn clean package
+FROM openjdk:8-jre-alpine
 
-# Use AdoptOpenJDK 11 as the base image for running the application
-FROM adoptopenjdk:11-jre-hotspot
+WORKDIR /swagger-petstore
 
-# Set the working directory inside the container
-WORKDIR /app
+COPY --from=0 /swagger-petstore/target/lib/jetty-runner.jar /swagger-petstore/jetty-runner.jar
+COPY --from=0 /swagger-petstore/target/*.war /swagger-petstore/server.war
+COPY src/main/resources/openapi.yaml /swagger-petstore/openapi.yaml
+COPY inflector.yaml /swagger-petstore/inflector.yaml
 
-# Copy the JAR file from the builder stage to the current stage
-COPY --from=builder /app/target/*.jar app.jar
-
-# Expose the port on which the Spring Boot application will run
 EXPOSE 8080
 
 USER 10014
 
-
-# Set the entry point for the container to run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "-DswaggerUrl=openapi.yaml", "/swagger-petstore/jetty-runner.jar", "/swagger-petstore/server.war"]
