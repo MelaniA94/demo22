@@ -2,7 +2,7 @@
 FROM maven:3.5-jdk-8-alpine AS builder
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR . /app
 
 # Copy the project files into the container
 COPY . .
